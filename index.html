@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Aset Perumahan</title>
+  <link href="https://jsdelivr.net" rel="stylesheet">
+  <script src="https://jsdelivr.net"></script>
+  <style>
+    body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
+    .nav-tabs .nav-link.active { background-color: #ffffff; font-weight: bold; border-bottom-color: transparent; }
+    .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+  </style>
+</head>
+<body>
+
+  <!-- GANTI DENGAN URL GOOGLE WEB APP ANDA -->
+  <script>
+    const API_URL = "MASUKKAN_URL_WEB_APP_GOOGLE_ANDA_DISINI";
+  </script>
+
+  <div class="container my-4">
+    <div class="text-center mb-4">
+      <h2 class="fw-bold text-primary">🏡 Sistem Manajemen Aset Perumahan</h2>
+      <p class="text-muted">Manajemen input data dan pantauan kondisi fasilitas warga</p>
+    </div>
+
+    <!-- Navigasi Menu Tab -->
+    <ul class="nav nav-tabs mb-4 justify-content-center" id="assetTab" role="tablist">
+      <li class="nav-item">
+        <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab">📊 Dashboard Pantauan</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="input-tab" data-bs-toggle="tab" data-bs-target="#input-form" type="button" role="tab">➕ Input Aset Baru</button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="assetTabContent">
+      <!-- TAB 1: DASHBOARD -->
+      <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
+        <div class="row g-3 mb-4 text-center">
+          <div class="col-6 col-md-3">
+            <div class="card bg-white p-3 border-start border-primary border-4">
+              <small class="text-uppercase text-muted fw-bold">Jenis Aset</small>
+              <h3 class="fw-bold text-primary mt-2" id="txtJenis">-</h3>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card bg-white p-3 border-start border-success border-4">
+              <small class="text-uppercase text-muted fw-bold">Total Unit</small>
+              <h3 class="fw-bold text-success mt-2" id="txtUnit">-</h3>
+            </div>
+          </div>
+          <div class="col-12 col-md-3">
+            <div class="card bg-white p-3 border-start border-info border-4">
+              <small class="text-uppercase text-muted fw-bold">Nilai Investasi</small>
+              <h4 class="fw-bold text-info mt-2" id="txtInvestasi">-</h4>
+            </div>
+          </div>
+          <div class="col-12 col-md-3">
+            <div class="card bg-white p-3 border-start border-danger border-4">
+              <small class="text-uppercase text-muted fw-bold">Aset Rusak Berat</small>
+              <h3 class="fw-bold text-danger mt-2" id="txtRusak">-</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-12 col-lg-6">
+            <div class="card p-3 bg-white" style="min-height: 350px;">
+              <h5 class="fw-bold mb-3">📦 Kuantitas Per Kategori</h5>
+              <canvas id="chartKategori"></canvas>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6">
+            <div class="card p-3 bg-white" style="min-height: 350px;">
+              <h5 class="fw-bold text-danger mb-3">⚠️ Daftar Kondisi Rusak Berat</h5>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="table-danger">
+                    <tr><th>ID</th><th>Nama Aset</th><th>Lokasi</th><th>Qty</th></tr>
+                  </thead>
+                  <tbody id="tabelRusak">
+                    <tr><td colspan="4" class="text-center text-muted">Memuat data...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: FORM INPUT -->
+      <div class="tab-pane fade" id="input-form" role="tabpanel">
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-8 col-lg-6">
+            <div class="card p-4 bg-white">
+              <h4 class="fw-bold mb-4 text-center text-secondary">Formulir Tambah Aset</h4>
+              <form id="formAset">
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Nama Barang / Aset</label>
+                  <input type="text" class="form-control" id="nama" placeholder="Contoh: Genset Balai Warga" required>
+                </div>
+                <div class="row g-3 mb-3">
+                  <div class="col-6">
+                    <label class="form-label fw-bold">Kategori</label>
+                    <select class="form-select" id="kategori" required>
+                      <option value="Elektronik">Elektronik</option>
+                      <option value="Fasilitas Umum">Fasilitas Umum</option>
+                      <option value="Alat Kebersihan">Alat Kebersihan</option>
+                      <option value="Keamanan">Keamanan</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label fw-bold">Kondisi</label>
+                    <select class="form-select" id="kondisi" required>
+                      <option value="Baik">Baik</option>
+                      <option value="Rusak Ringan">Rusak Ringan</option>
+                      <option value="Rusak Berat">Rusak Berat</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Lokasi Penempatan</label>
+                  <input type="text" class="form-control" id="lokasi" placeholder="Contoh: Pos Satpam Blok C" required>
+                </div>
+                <div class="row g-3 mb-4">
+                  <div class="col-6">
+                    <label class="form-label fw-bold">Jumlah (Qty)</label>
+                    <input type="number" class="form-control" id="qty" min="1" required>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label fw-bold">Harga Satuan (Rp)</label>
+                    <input type="number" class="form-control" id="harga" placeholder="Murni angka" required>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-success w-100 py-2 fw-bold" id="btnSimpan">💾 Simpan Data Ke Google Sheets</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://jsdelivr.net"></script>
+  <script>
+    let myChart = null;
+
+    function muatDashboard() {
+      fetch(API_URL)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('txtJenis').innerText = data.totalJenis;
+          document.getElementById('txtUnit').innerText = data.totalUnit;
+          document.getElementById('txtInvestasi').innerText = data.totalInvestasi;
+          document.getElementById('txtRusak').innerText = data.rusakBerat;
+
+          let rows = "";
+          if(data.listRusak.length === 0) {
+            rows = `<tr><td colspan="4" class="text-center text-success fw-bold">✅ Semua aset dalam kondisi baik!</td></tr>`;
+          } else {
+            data.listRusak.forEach(item => {
+              rows += `<tr><td>${item.id}</td><td class="fw-bold">${item.nama}</td><td>${item.lokasi}</td><td><span class="badge bg-danger">${item.qty}</span></td></tr>`;
+            });
+          }
+          document.getElementById('tabelRusak').innerHTML = rows;
+
+          const ctx = document.getElementById('chartKategori').getContext('2d');
+          if(myChart) myChart.destroy();
+          myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: data.kategoriLabels,
+              datasets: [{ label: 'Unit', data: data.kategoriValues, backgroundColor: '#3b82f6', borderRadius: 5 }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+          });
+        });
+    }
+
+    document.getElementById('formAset').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSimpan');
+      btn.innerText = "⏳ Menyimpan...";
+      btn.disabled = true;
+
+      const payload = {
+        nama: document.getElementById('nama').value,
+        kategori: document.getElementById('kategori').value,
+        kondisi: document.getElementById('kondisi').value,
+        lokasi: document.getElementById('lokasi').value,
+        qty: document.getElementById('qty').value,
+        harga: document.getElementById('harga').value
+      };
+
+      fetch(API_URL, { method: "POST", body: JSON.stringify(payload) })
+        .then(res => res.json())
+        .then(res => {
+          if(res.status === "success") {
+            alert("🎉 Data Berhasil Disimpan ke Google Sheets!");
+            document.getElementById('formAset').reset();
+            muatDashboard();
+            // Pindah tab ke dashboard otomatis
+            const triggerEl = document.querySelector('#assetTab button[data-bs-target="#dashboard"]');
+            bootstrap.Tab.getInstance(triggerEl).show();
+          } else {
+            alert("❌ Gagal menyimpan: " + res.message);
+          }
+        })
+        .catch(err => alert("❌ Terjadi kesalahan jaringan."))
+        .finally(() => {
+          btn.innerText = "💾 Simpan Data Ke Google Sheets";
+          btn.disabled = false;
+        });
+    });
+
+    window.onload = muatDashboard;
+  </script>
+</body>
+</html>
